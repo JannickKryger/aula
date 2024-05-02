@@ -387,7 +387,7 @@ class Client:
                 )
 
             def ugeplan(week, thisnext):
-                if "0029" in self.widgets and "0030" not in self.widgets:
+                if "0029" in self.widgets:
                     token = self.get_token("0029")
                     get_payload = (
                         "/ugebrev?assuranceLevel=2&childFilter="
@@ -412,7 +412,7 @@ class Client:
                         elif thisnext == "next":
                             self.ugepnext_attr[person["navn"].split()[0]] = ugeplan
 
-                if "0030" in self.widgets:
+                if "0030" in self.widgets and "0029" not in self.widgets:
                     _LOGGER.debug("In the MU Opgaver flow")
                     token = self.get_token("0030")
                     get_payload = (
