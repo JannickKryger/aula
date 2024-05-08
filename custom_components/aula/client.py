@@ -2,6 +2,7 @@ import logging
 import requests
 import datetime
 import pytz
+import pandas as pd
 from bs4 import BeautifulSoup
 import json, re
 from .const import (
@@ -291,9 +292,9 @@ class Client:
             )
             # _LOGGER.debug("threadres "+str(threadres.text))
             if threadres.json()["status"]["code"] == 403:
-                self.message[
-                    "text"
-                ] = "Log ind på Aula med MitID for at læse denne besked."
+                self.message["text"] = (
+                    "Log ind på Aula med MitID for at læse denne besked."
+                )
                 self.message["sender"] = "Ukendt afsender"
                 self.message["subject"] = "Følsom besked"
             else:
@@ -407,10 +408,24 @@ class Client:
                     # _LOGGER.debug("ugeplaner response "+str(ugeplaner.text))
                     for person in ugeplaner.json()["personer"]:
                         ugeplan = person["institutioner"][0]["ugebreve"][0]["indhold"]
-                        if thisnext == "this":
-                            self.ugep_attr[person["navn"].split()[0]] = ugeplan
-                        elif thisnext == "next":
-                            self.ugepnext_attr[person["navn"].split()[0]] = ugeplan
+                        df_list = pd.read_html(ugeplan)
+                        for dt in df_list:
+                            for row in dt.iterrows():
+                                print(row[1][0], row[1][1])
+                                if thisnext == "this":
+                                    attrName = (
+                                        person["navn"].split()[0]
+                                        + "_"
+                                        + row[1][0].replace(" ", "")
+                                    )
+                                    self.ugep_attr[attrName] = row[1][1]
+                                elif thisnext == "next":
+                                    attrName = (
+                                        person["navn"].split()[0]
+                                        + "_"
+                                        + row[1][0].replace(" ", "")
+                                    )
+                                    self.ugepnext_attr[attrName] = row[1][1]
 
                 if "0030" in self.widgets and "0029" not in self.widgets:
                     _LOGGER.debug("In the MU Opgaver flow")
