@@ -410,22 +410,12 @@ class Client:
                         ugeplan = person["institutioner"][0]["ugebreve"][0]["indhold"]
                         df_list = pd.read_html(ugeplan)
                         for dt in df_list:
-                            for row in dt.iterrows():
-                                print(row[1][0], row[1][1])
-                                if thisnext == "this":
-                                    attrName = (
-                                        person["navn"].split()[0]
-                                        + "_"
-                                        + row[1][0].replace(" ", "")
-                                    )
-                                    self.ugep_attr[attrName] = row[1][1]
-                                elif thisnext == "next":
-                                    attrName = (
-                                        person["navn"].split()[0]
-                                        + "_"
-                                        + row[1][0].replace(" ", "")
-                                    )
-                                    self.ugepnext_attr[attrName] = row[1][1]
+                            if thisnext == "this":
+                                attrName = person["navn"].split()[0]
+                                self.ugep_attr[attrName] = dt.to_markdown()
+                            elif thisnext == "next":
+                                attrName = person["navn"].split()[0]
+                                self.ugepnext_attr[attrName] = dt.to_markdown()
 
                 if "0030" in self.widgets and "0029" not in self.widgets:
                     _LOGGER.debug("In the MU Opgaver flow")
